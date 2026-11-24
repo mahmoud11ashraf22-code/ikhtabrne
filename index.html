@@ -179,6 +179,10 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
 <main>
 <section class="page active" id="home">
  <div class="hero"><div class="eyebrow">✦ لوحة التحكم الشخصية</div><h1 id="welcome">أهلاً بيك 👋</h1><p>منصة تعليمية تجمع الامتحانات والفيديوهات والمنتدى وتنظيم المذاكرة في مكان واحد.</p></div>
+ <div class="card" id="dailyBriefingCard" style="background:linear-gradient(135deg,#241c3a,#15182b);border-color:#5d3d75">
+  <div class="row"><h2>☀️ ملخص اليوم الصباحي</h2><span class="tag" id="briefingTag">مهام اليوم</span></div>
+  <div id="dailyBriefingBody" class="smallnote">جاري تحميل مهام وأولويات اليوم...</div>
+ </div>
  <div class="energy-ribbon" aria-label="ابدأ بخطوة وركز وحقق إنجازاً"><span>🔥 طاقة اليوم</span><i>ابدأ صغير</i><i>ركز بذكاء</i><i>اكسب يومك</i></div>
  <div class="guide" id="startGuide">
   <div class="guidehead"><b>🚀 نبدأ منين؟</b><span class="tag" id="setupProgress">0 من 4 خطوات</span></div>
@@ -230,6 +234,16 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
 
 <section class="page" id="focus">
  <h1>⏱️ وضع التركيز</h1><p class="sub">اختار مدة مناسبة، وابعد المشتتات، وابدأ جلستك.</p>
+ <div class="card">
+  <div class="row"><h2>🎵 أصوات التركيز الهادئة</h2><span class="tag">Ambient</span></div>
+  <p class="smallnote">شغّل أصوات خلفية تساعدك على التركيز أثناء المذاكرة:</p>
+  <div class="formgrid">
+   <button class="btn ghost small" onclick="playAmbientSound('rain')">🌧️ صوت المطر</button>
+   <button class="btn ghost small" onclick="playAmbientSound('cafe')">☕ ضوضاء مقهى</button>
+   <button class="btn ghost small" onclick="playAmbientSound('waves')">🌊 أمواج البحر</button>
+   <button class="btn danger small" onclick="stopAmbientSound()">🔇 إيقاف الصوت</button>
+  </div>
+ </div>
  <div class="card timer"><label style="text-align:right">هتذاكر إيه في الجلسة؟</label><select id="focusTaskSelect" onchange="setFocusTarget(this.value)"><option value="">جلسة عامة</option></select><div class="ring"><small class="green" id="timerMode">وقت التركيز</small><div class="clock" id="clock">25:00</div><small class="muted">خليك مع المهمة الحالية</small></div><div class="timeractions"><button class="btn greenbtn" id="timerToggle" onclick="toggleTimer()">ابدأ الجلسة</button><button class="btn ghost" onclick="resetTimer()">إعادة</button></div><p class="smallnote" id="focusTargetHint">عند انتهاء الجلسة هتتسجل مدة تركيزك.</p><div class="divider"></div><div class="timeractions"><button class="btn ghost small" onclick="setTimer(15)">15 دقيقة</button><button class="btn ghost small" onclick="setTimer(25)">25 دقيقة</button><button class="btn ghost small" onclick="setTimer(50)">50 دقيقة</button></div></div>
  <div class="card"><h2>📊 سجل التركيز</h2><div class="grid"><div class="stat"><b id="focusSessions">0</b><span>جلسة مكتملة</span></div><div class="stat"><b id="focusMinutes">0</b><span>دقيقة إجمالي</span></div></div><p class="smallnote">الجلسة تسجل بعد اكتمال المؤقت. إيقاف المؤقت مؤقتاً لا يسجل جلسة.</p></div>
 </section>
@@ -238,7 +252,10 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
  <h1>🔁 مراجعتي</h1><p class="sub">خطط مراجعاتك، وسجّل اللي راجعته عشان ما تنساش ترجعله.</p>
  <div class="card"><div class="row"><h2>مراجعات المواد</h2><button class="btn small" onclick="openReview()">+ مراجعة</button></div><div id="reviewsList"></div></div>
  <div class="card">
-  <h2>❌ بنك الأخطاء للمراجعة اللاحقة</h2>
+  <div class="row">
+    <h2>❌ بنك الأخطاء للمراجعة اللاحقة</h2>
+    <button class="btn greenbtn small" onclick="openFlashcards()">🃏 مراجعة بالبطاقات (Flashcards)</button>
+  </div>
   <p class="smallnote">تُجمع هنا الأسئلة التي أخطأت فيها تلقائياً لمراجعتها.</p>
   <div id="mistakesBankList" class="empty">لا توجد أخطاء مسجلة حتى الآن.</div>
  </div>
@@ -343,7 +360,7 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script>
 let STORAGE_KEY='mahmoud_study_v2_guest'; let activeStudentUid=null; let activeStudentName='';
-const blank=()=>({profile:{name:'',examDate:'',wake:'06:00',sleep:'22:00',status:'مراكم أوي',hours:4},subjects:[],tasks:[],lessons:[],backlog:[],backlogTotal:0,backlogDone:0,backlogTarget:null,focus:{sessions:0,minutes:0},focusLog:[],exams:[],words:[],reviews:[],plan:[],leader:{alias:'',opt:false},gamify:{points:0,studyDays:[],earned:[]},challenge:{goal:3,weekStart:''},savedExams:[]});
+const blank=()=>({profile:{name:'',examDate:'',wake:'06:00',sleep:'22:00',status:'مراكم أوي',hours:4},subjects:[],tasks:[],lessons:[],backlog:[],backlogTotal:0,backlogDone:0,backlogTarget:null,focus:{sessions:0,minutes:0},focusLog:[],exams:[],words:[],reviews:[],plan:[],leader:{alias:'',opt:false},gamify:{points:0,studyDays:[],earned:[]},challenge:{goal:3,weekStart:''},savedExams:[],localSubmissions:[]});
 let db=loadDB(),timerSeconds=1500,timerInitial=1500,timerRunning=false,timerInterval=null,timerIsBreak=false,focusTargetId='',focusTargetMeta=null,cloud={ready:false,store:null,functions:null,storage:null};
 let studyMode=localStorage.getItem('mahmoud_study_mode')==='pro'?'pro':'simple';
 function applyMode(){document.body.classList.toggle('pro-mode',studyMode==='pro');let b=document.getElementById('modeToggle'),t=document.getElementById('modeTitle'),d=document.getElementById('modeDesc');if(b)b.textContent=studyMode==='pro'?'الوضع الاحترافي':'الوضع البسيط';if(t)t.textContent=studyMode==='pro'?'الوضع الاحترافي':'الوضع البسيط';if(d)d.textContent=studyMode==='pro'?'كل الأدوات والتحليلات ظاهرة.':'الأساسيات قدامك من غير زحمة.';}
@@ -454,6 +471,8 @@ let week=Date.now()-7*86400000;document.getElementById('weekMinutes').textConten
  [['proWeeklyFocus',proMinutes],['proDoneTasks',proDone],['proBacklog',proBacklog],['proCompletion',proPct+'%']].forEach(([id,v])=>{let el=document.getElementById(id);if(el)el.textContent=v});
  renderGamify();buildWeeklyReport(false);document.getElementById('cloudStatus').textContent=cloud.ready?'● متصل بالسحابة':'● جارٍ الاتصال بالسحابة';document.getElementById('firebaseState').textContent=cloud.ready?'متصل':'غير مهيأ';document.getElementById('firebaseState').className=cloud.ready?'tag':'tag redtag';
  if(typeof getStudentNotifications==='function')getStudentNotifications();
+ if(typeof renderDailyBriefing==='function')renderDailyBriefing();
+ if(typeof refreshAllStudentViews==='function')refreshAllStudentViews();
  if(typeof renderSavedExams==='function')renderSavedExams();
 }
 
@@ -670,9 +689,73 @@ async function publishForumPost(){const user=studentAuth?.currentUser;if(!user)r
 async function toggleForum(){if(!adminUnlocked)return toast('افتح لوحة الإدارة بكلمة المرور');try{let next=!platform.forumOpen;await adminCall('setForumOpen',{open:next});platform.forumOpen=next;renderPlatform();toast(next?'تم فتح المنتدى للجميع':'تم غلق المنتدى')}catch(e){toast(e.message||'تعذر تغيير حالة المنتدى')}}
 async function publishAnnouncement(){if(!adminUnlocked)return toast('هذه العملية للإدارة فقط');let text=document.getElementById('announcementText').value.trim();if(!text)return toast('اكتب نص الإعلان');try{await adminCall('publishAnnouncement',{text});document.getElementById('announcementText').value='';toast('تم نشر الإعلان للجميع')}catch(e){toast('تعذر نشر الإعلان: '+e.message)}}
 function adminDeleteControl(collection,id){return adminUnlocked?'<button class="btn danger small" onclick="deletePublicItem(\''+collection+'\',\''+safeText(id)+'\')">حذف</button>':''}
-function renderPlatform(){let take=document.getElementById('examTaking'),requested=new URLSearchParams(location.search).get('exam');if(take&&requested){let e=platform.exams.find(x=>x.id===requested);if(e){let qs=e.questions||[];take.style.display='block';take.innerHTML='<h2>'+safeText(e.title)+'</h2><p class="smallnote">'+safeText(e.subject)+' • '+e.duration+' دقيقة</p><p>'+safeText(e.desc)+'</p>'+(qs.length?qs.map((q,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(q.text)+'</b>'+(q.type==='essay'?'<label>إجابتك المقالية</label><textarea id="essay_'+i+'" rows="5" placeholder="اكتب إجابتك هنا"></textarea>':'<div>'+q.choices.map((v,j)=>'<label class="checkline"><input type="radio" name="exam_'+i+'" value="'+j+'"> '+['أ','ب','ج','د'][j]+' — '+safeText(v)+'</label>').join('')+'</div>')+'</div>').join(''):'<div class="empty">هذا الامتحان لا يحتوي على أسئلة.</div>')+(qs.length?'<button class="btn full" onclick="submitPlatformExam(\''+e.id+'\')">تسليم الامتحان</button><p class="smallnote">يتم تصحيح الاختياري تلقائياً، وتُحفظ الإجابات المقالية للمراجعة اليدوية.</p>':'')}else{take.style.display='block';take.innerHTML='<div class="empty">الامتحان غير موجود أو لم يكتمل تحميل بيانات Firebase بعد.</div>'}}else if(take)take.style.display='none';let ex=document.getElementById('platformExamList');if(ex)ex.innerHTML=platform.exams.length?platform.exams.map(e=>'<div class="item"><b>'+safeText(e.title)+'</b><p>'+((e.questions||[]).length)+' سؤال • '+e.duration+' دقيقة</p><button class="btn ghost small" onclick="copyPlatformLink(\''+e.id+'\')">نسخ الرابط</button> <button class="btn ghost small" onclick="toggleSaveExam(\''+safeText(e.id)+'\')">🔖 ${(db.savedExams||[]).includes(e.id)?'محفوظ':'حفظ'}</button>'+adminDeleteControl('publicExams',e.id)+'</div>').join(''):'<div class="empty">لا توجد امتحانات بعد.</div>';let vl=document.getElementById('videoLibrary');if(vl)vl.innerHTML=platform.videos.length?platform.videos.map(v=>'<div class="item"><b>'+safeText(v.title)+'</b><p>'+safeText(v.subject)+' • '+safeText(v.unit)+'</p><a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.youtubeId)+'" target="_blank" rel="noopener">مشاهدة على YouTube ↗</a>'+adminDeleteControl('publicVideos',v.id)+'</div>').join(''):'<div class="empty">لم تتم إضافة فيديوهات بعد.</div>';let fp=document.getElementById('forumPosts');if(fp){fp.innerHTML=platform.posts.length?[...platform.posts].reverse().map(p=>{let mine=!!activeStudentUid&&p.authorUid===activeStudentUid;let stamp=p.createdAt?.toDate?p.createdAt.toDate().toLocaleString('ar-EG'):(p.createdAt?safeText(p.createdAt):'الآن');let legacy=p.title&&p.title!=='رسالة'?'<div class="chat-message-title">'+safeText(p.title)+'</div>':'';return '<div class="chat-message '+(mine?'mine':'')+'"><div class="chat-message-head"><b>'+safeText(p.authorName||'طالب')+'</b><time>'+stamp+'</time></div>'+legacy+'<div class="chat-message-body">'+safeText(p.body)+'</div><div class="chat-message-tools">'+adminDeleteControl('forumPosts',p.id)+'</div></div>'}).join(''):'<div class="empty">لا توجد رسائل بعد. ابدأ المحادثة.</div>';fp.scrollTop=fp.scrollHeight;}let forumInput=document.getElementById('forumBody'),forumSend=document.getElementById('forumSendBtn');if(forumInput)forumInput.disabled=!platform.forumOpen;if(forumSend)forumSend.disabled=!platform.forumOpen;let forumHint=document.getElementById('forumHint');if(forumHint)forumHint.textContent=platform.forumOpen?'احترم الآخرين. الرسائل تُحفظ على Firebase وتظهر للحسابات الأخرى.':'المنتدى مغلق حالياً بواسطة الإدارة.';let al=document.getElementById('announcementList');if(al)al.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+adminDeleteControl('publicAnnouncements',a.id)+'</div>').join('');let pal=document.getElementById('publicAnnouncementList');if(pal)pal.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+'</div>').join('')||'<div class="empty">لا توجد إعلانات حالياً.</div>';[['adminExamCount',platform.exams.length],['adminVideoCount',platform.videos.length],['adminPostCount',platform.posts.length],['adminNoticeCount',platform.announcements.length]].forEach(([id,n])=>{let x=document.getElementById(id);if(x)x.textContent=n});let fs=document.getElementById('forumState');if(fs)fs.textContent=platform.forumOpen?'مفتوح':'مغلق';let fas=document.getElementById('forumAdminState');if(fas)fas.textContent=platform.forumOpen?'المنتدى مفتوح':'المنتدى مغلق';if(typeof getStudentNotifications==='function')getStudentNotifications();if(typeof renderSavedExams==='function')renderSavedExams();}
+function renderPlatform(){let take=document.getElementById('examTaking'),requested=new URLSearchParams(location.search).get('exam');if(take&&requested){let e=platform.exams.find(x=>x.id===requested);if(e){let qs=e.questions||[];take.style.display='block';take.innerHTML='<h2>'+safeText(e.title)+'</h2><p class="smallnote">'+safeText(e.subject)+' • '+e.duration+' دقيقة</p><p>'+safeText(e.desc)+'</p>'+(qs.length?qs.map((q,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(q.text)+'</b>'+(q.type==='essay'?'<label>إجابتك المقالية</label><textarea id="essay_'+i+'" rows="5" placeholder="اكتب إجابتك هنا"></textarea>':'<div>'+q.choices.map((v,j)=>'<label class="checkline"><input type="radio" name="exam_'+i+'" value="'+j+'"> '+['أ','ب','ج','د'][j]+' — '+safeText(v)+'</label>').join('')+'</div>')+'</div>').join(''):'<div class="empty">هذا الامتحان لا يحتوي على أسئلة.</div>')+(qs.length?'<button class="btn full" onclick="submitPlatformExam(\''+e.id+'\')">تسليم الامتحان</button><p class="smallnote">يتم تصحيح الاختياري تلقائياً، وتُحفظ الإجابات المقالية للمراجعة اليدوية.</p>':'')}else{take.style.display='block';take.innerHTML='<div class="empty">الامتحان غير موجود أو لم يكتمل تحميل بيانات Firebase بعد.</div>'}}else if(take)take.style.display='none';let ex=document.getElementById('platformExamList');if(ex)ex.innerHTML=platform.exams.length?platform.exams.map(e=>'<div class="item"><b>'+safeText(e.title)+'</b><p>'+((e.questions||[]).length)+' سؤال • '+e.duration+' دقيقة</p><button class="btn ghost small" onclick="copyPlatformLink(\''+e.id+'\')">نسخ الرابط</button> <button class="btn ghost small" onclick="toggleSaveExam(\''+safeText(e.id)+'\')">🔖 ${((typeof db!=='undefined'&&db.savedExams)||[]).includes(e.id)?'محفوظ':'حفظ'}</button>'+adminDeleteControl('publicExams',e.id)+'</div>').join(''):'<div class="empty">لا توجد امتحانات بعد.</div>';let vl=document.getElementById('videoLibrary');if(vl)vl.innerHTML=platform.videos.length?platform.videos.map(v=>'<div class="item"><b>'+safeText(v.title)+'</b><p>'+safeText(v.subject)+' • '+safeText(v.unit)+'</p><a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.youtubeId)+'" target="_blank" rel="noopener">مشاهدة على YouTube ↗</a>'+adminDeleteControl('publicVideos',v.id)+'</div>').join(''):'<div class="empty">لم تتم إضافة فيديوهات بعد.</div>';let fp=document.getElementById('forumPosts');if(fp){fp.innerHTML=platform.posts.length?[...platform.posts].reverse().map(p=>{let mine=!!activeStudentUid&&p.authorUid===activeStudentUid;let stamp=p.createdAt?.toDate?p.createdAt.toDate().toLocaleString('ar-EG'):(p.createdAt?safeText(p.createdAt):'الآن');let legacy=p.title&&p.title!=='رسالة'?'<div class="chat-message-title">'+safeText(p.title)+'</div>':'';return '<div class="chat-message '+(mine?'mine':'')+'"><div class="chat-message-head"><b>'+safeText(p.authorName||'طالب')+'</b><time>'+stamp+'</time></div>'+legacy+'<div class="chat-message-body">'+safeText(p.body)+'</div><div class="chat-message-tools">'+adminDeleteControl('forumPosts',p.id)+'</div></div>'}).join(''):'<div class="empty">لا توجد رسائل بعد. ابدأ المحادثة.</div>';fp.scrollTop=fp.scrollHeight;}let forumInput=document.getElementById('forumBody'),forumSend=document.getElementById('forumSendBtn');if(forumInput)forumInput.disabled=!platform.forumOpen;if(forumSend)forumSend.disabled=!platform.forumOpen;let forumHint=document.getElementById('forumHint');if(forumHint)forumHint.textContent=platform.forumOpen?'احترم الآخرين. الرسائل تُحفظ على Firebase وتظهر للحسابات الأخرى.':'المنتدى مغلق حالياً بواسطة الإدارة.';let al=document.getElementById('announcementList');if(al)al.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+adminDeleteControl('publicAnnouncements',a.id)+'</div>').join('');let pal=document.getElementById('publicAnnouncementList');if(pal)pal.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+'</div>').join('')||'<div class="empty">لا توجد إعلانات حالياً.</div>';[['adminExamCount',platform.exams.length],['adminVideoCount',platform.videos.length],['adminPostCount',platform.posts.length],['adminNoticeCount',platform.announcements.length]].forEach(([id,n])=>{let x=document.getElementById(id);if(x)x.textContent=n});let fs=document.getElementById('forumState');if(fs)fs.textContent=platform.forumOpen?'مفتوح':'مغلق';let fas=document.getElementById('forumAdminState');if(fas)fas.textContent=platform.forumOpen?'المنتدى مفتوح':'المنتدى مغلق';if(typeof getStudentNotifications==='function')getStudentNotifications();if(typeof renderSavedExams==='function')renderSavedExams();}
 
-async function submitPlatformExam(id){if(!studentAuth?.currentUser)return toast('سجّل الدخول أولاً لتسليم الامتحان');const e=platform.exams.find(x=>x.id===id);if(!e)return;const qs=e.questions||[];if(!qs.length)return toast('لا توجد أسئلة في هذا الامتحان');let correct=0,total=0,answered=0,essayCount=0;const answers=qs.map((q,i)=>{if(q.type==='essay'){const value=(document.getElementById('essay_'+i)?.value||'').trim();essayCount++;if(value)answered++;return {questionIndex:i,question:q.text,type:'essay',studentAnswer:value,correctAnswer:q.correctAnswer||'',points:Math.max(1,+q.points||1),status:'بانتظار المراجعة اليدوية'}}const pts=Math.max(1,+q.points||1);total+=pts;const c=document.querySelector('input[name="exam_'+i+'"]:checked');const val=c?String(c.value):'';if(c)answered++;const isCorrect=!!c&&val===String(q.answer);if(isCorrect)correct+=pts;return {questionIndex:i,question:q.text,type:'mcq',studentAnswer:val===''?'لم تتم الإجابة':(q.choices[+val]||''),studentChoice:val,correctAnswer:q.choices[+q.answer]||'',isCorrect,points:pts,earned:isCorrect?pts:0}});const percent=total?Math.round(correct/total*100):0;const submission={examId:id,examTitle:e.title,subject:e.subject||'عام',correct,total,percent,answered,essayCount,status:essayCount?'تم تصحيح الاختياري • المقالي بانتظار المراجعة':'تم التصحيح تلقائياً',answers,studentUid:studentAuth.currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()};try{await cloud.store.collection('examSubmissions').add({...submission,studentName:db.profile.name||studentAuth.currentUser.displayName||'طالب'});const review=answers.map((a,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(a.question)+'</b>'+(a.type==='essay'?'<p><b>إجابتك:</b><br>'+safeText(a.studentAnswer||'لم تتم الإجابة')+'</p><p><b>الإجابة النموذجية:</b><br>'+safeText(a.correctAnswer||'لم يحدد واضع الامتحان إجابة نموذجية')+'</p><span class="tag">بانتظار المراجعة اليدوية • '+a.points+' درجات</span>':'<p>إجابتك: '+safeText(a.studentAnswer)+'</p><p>الإجابة الصحيحة: '+safeText(a.correctAnswer)+'</p><span class="tag '+(a.isCorrect?'':'redtag')+'">'+(a.isCorrect?'إجابة صحيحة':'إجابة غير صحيحة')+' • '+a.earned+'/'+a.points+'</span>')+'</div>').join('');document.getElementById('examTaking').innerHTML='<h2>تم تسليم الامتحان ✓</h2><div class="stat"><b>'+correct+' / '+total+'</b><span>درجة الاختياري • '+percent+'%</span></div><p>عدد الإجابات: '+answered+' من '+qs.length+'</p>'+(essayCount?'<p class="smallnote">لديك '+essayCount+' سؤال مقالي محفوظ للمراجعة اليدوية، ودرجته غير محسوبة بعد.</p>':'')+'<h3>مراجعة إجاباتك</h3>'+review;toast('تم تسليم الامتحان وحفظ إجاباتك')}catch(err){toast('تعذر حفظ التسليم: '+err.message)}}
+async function submitPlatformExam(id){
+  if(!studentAuth?.currentUser)return toast('سجّل الدخول أولاً لتسليم الامتحان');
+  const e=platform.exams.find(x=>x.id===id);
+  if(!e)return toast('بيانات الامتحان غير مكتملة');
+  const qs=e.questions||[];
+  if(!qs.length)return toast('لا توجد أسئلة في هذا الامتحان');
+  let correct=0,total=0,answered=0,essayCount=0;
+  const answers=qs.map((q,i)=>{
+    if(q.type==='essay'){
+      const value=(document.getElementById('essay_'+i)?.value||'').trim();
+      essayCount++;
+      if(value)answered++;
+      return {questionIndex:i,question:q.text,type:'essay',studentAnswer:value,correctAnswer:q.correctAnswer||'',points:Math.max(1,+q.points||1),status:'بانتظار المراجعة اليدوية'};
+    }
+    const pts=Math.max(1,+q.points||1);
+    total+=pts;
+    const c=document.querySelector('input[name="exam_'+i+'"]:checked');
+    const val=c?String(c.value):'';
+    if(c)answered++;
+    const isCorrect=!!c&&val===String(q.answer);
+    if(isCorrect)correct+=pts;
+    return {questionIndex:i,question:q.text,type:'mcq',studentAnswer:val===''?'لم تتم الإجابة':(q.choices[+val]||''),studentChoice:val,correctAnswer:q.choices[+q.answer]||'',isCorrect,points:pts,earned:isCorrect?pts:0};
+  });
+  const percent=total?Math.round(correct/total*100):0;
+  const localRecord={
+    id:'LOC_'+Date.now(),
+    examId:id,
+    examTitle:e.title,
+    subject:e.subject||'عام',
+    correct,
+    total,
+    percent,
+    answered,
+    essayCount,
+    status:essayCount?'تم تصحيح الاختياري • المقالي بانتظار المراجعة':'تم التصحيح تلقائياً',
+    answers,
+    studentUid:studentAuth.currentUser.uid,
+    createdAt:new Date().toISOString()
+  };
+
+  // 1. Save locally immediately so History, Analytics, and Mistakes Bank always work
+  if(!Array.isArray(db.localSubmissions))db.localSubmissions=[];
+  db.localSubmissions.unshift(localRecord);
+  saveDB();
+  refreshAllStudentViews();
+
+  // 2. Display answers and score immediately on screen
+  const review=answers.map((a,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(a.question)+'</b>'+(a.type==='essay'?'<p><b>إجابتك:</b><br>'+safeText(a.studentAnswer||'لم تتم الإجابة')+'</p><p><b>الإجابة النموذجية:</b><br>'+safeText(a.correctAnswer||'لم يحدد واضع الامتحان إجابة نموذجية')+'</p><span class="tag">بانتظار المراجعة اليدوية • '+a.points+' درجات</span>':'<p>إجابتك: '+safeText(a.studentAnswer)+'</p><p>الإجابة الصحيحة: '+safeText(a.correctAnswer)+'</p><span class="tag '+(a.isCorrect?'':'redtag')+'">'+(a.isCorrect?'إجابة صحيحة':'إجابة غير صحيحة')+' • '+a.earned+'/'+a.points+'</span>')+'</div>').join('');
+  const takeBox=document.getElementById('examTaking');
+  if(takeBox){
+    takeBox.innerHTML='<h2>تم تسليم الامتحان ✓</h2><div class="stat"><b>'+correct+' / '+total+'</b><span>درجة الاختياري • '+percent+'%</span></div><p>عدد الإجابات: '+answered+' من '+qs.length+'</p>'+(essayCount?'<p class="smallnote">لديك '+essayCount+' سؤال مقالي محفوظ للمراجعة اليدوية، ودرجته غير محسوبة بعد.</p>':'')+'<h3>مراجعة إجاباتك</h3>'+review+'<button class="btn ghost full" onclick="location.href=location.pathname">العودة لقائمة الامتحانات</button>';
+    takeBox.scrollIntoView({behavior:'smooth'});
+  }
+
+  // 3. Sync to Firebase in background
+  try{
+    const cloudPayload={...localRecord,studentName:db.profile.name||studentAuth.currentUser.displayName||'طالب',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    delete cloudPayload.id;
+    await cloud.store.collection('examSubmissions').add(cloudPayload);
+    toast('تم تسليم الامتحان وحفظ إجاباتك في السحابة ✓');
+  }catch(err){
+    console.warn('Cloud submission warning:',err);
+    toast('تم عرض النتيجة وحفظها على جهازك (تنبيه سحابة: '+(err.code||err.message)+')');
+  }
+}
 
 function adminLogout(){adminUnlocked=false;adminPasswordMemory='';if(!studentAuth?.currentUser){showAuthGate();toast('تم إغلاق لوحة الإدارة')}else{go('home');toast('تم إغلاق لوحة الإدارة')}}
 const oldGo=go;go=function(id){if(id==='admin'){if(!adminUnlocked){adminLogin();return}}oldGo(id);renderPlatform();if(id==='admin'){loadVisitors();loadAdminSubmissions()}};
@@ -682,28 +765,47 @@ function applyDayNight(){let day=localStorage.getItem('mahmoud_day_theme')==='da
 
 /* ===== المميزات المضافة: التحليل، السجل، بنك الأخطاء، المحفوظات، الإشعارات ===== */
 let historyUnsubscribe = null;
+let cloudSubmissionsCache = [];
+
+function getCombinedSubmissions() {
+  const local = Array.isArray(db.localSubmissions) ? db.localSubmissions : [];
+  const cloudRows = Array.isArray(cloudSubmissionsCache) ? cloudSubmissionsCache : [];
+  const map = new Map();
+  local.forEach(r => map.set(r.examId + '_' + Math.floor(timeValue(r.createdAt)/5000), r));
+  cloudRows.forEach(r => map.set(r.examId + '_' + Math.floor(timeValue(r.createdAt)/5000), r));
+  return Array.from(map.values()).sort((a, b) => timeValue(b.createdAt) - timeValue(a.createdAt));
+}
+
+function refreshAllStudentViews() {
+  const rows = getCombinedSubmissions();
+  const host = document.getElementById('myExamHistory');
+  if (host) {
+    host.innerHTML = rows.length ? rows.map(r => `
+      <div class="item">
+        <div class="row">
+          <strong>${esc(r.examTitle || 'امتحان')}</strong>
+          <span class="tag ${(r.percent ?? 0) >= 50 ? '' : 'redtag'}">${r.percent ?? 0}%</span>
+        </div>
+        <p>${r.subject ? esc(r.subject) + ' • ' : ''}الدرجة: ${r.correct ?? 0} من ${r.total ?? 0} • الحالة: ${esc(r.status || 'مكتمل')}</p>
+      </div>`).join('') : '<div class="empty">لا توجد محاولات سابقة مسجلة.</div>';
+  }
+  renderStudentAnalytics(rows);
+  renderMistakesBank(rows);
+}
+
 function syncStudentHistory(uid) {
+  refreshAllStudentViews();
   if (!cloud.ready || !uid) return;
   if (historyUnsubscribe) { try { historyUnsubscribe(); } catch (_) {} }
   historyUnsubscribe = cloud.store.collection('examSubmissions')
     .where('studentUid', '==', uid)
     .onSnapshot(snap => {
-      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => timeValue(b.createdAt) - timeValue(a.createdAt));
-      const host = document.getElementById('myExamHistory');
-      if (host) {
-        host.innerHTML = rows.length ? rows.map(r => `
-          <div class="item">
-            <div class="row">
-              <strong>${esc(r.examTitle || 'امتحان')}</strong>
-              <span class="tag ${(r.percent ?? 0) >= 50 ? '' : 'redtag'}">${r.percent ?? 0}%</span>
-            </div>
-            <p>${r.subject ? esc(r.subject) + ' • ' : ''}الدرجة: ${r.correct ?? 0} من ${r.total ?? 0} • الحالة: ${esc(r.status || 'مكتمل')}</p>
-          </div>`).join('') : '<div class="empty">لا توجد محاولات سابقة مسجلة.</div>';
-      }
-      renderStudentAnalytics(rows);
-      renderMistakesBank(rows);
-    }, err => console.warn('history sync', err));
+      cloudSubmissionsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      refreshAllStudentViews();
+    }, err => {
+      console.warn('history sync', err);
+      refreshAllStudentViews();
+    });
 }
 
 function renderStudentAnalytics(submissions) {
@@ -848,6 +950,165 @@ function openNotifications() {
       <button class="btn ghost small" onclick="${a.action}">فتح الآن</button>
     </div>`).join('') : '<div class="empty">لا توجد إشعارات أو واجبات جديدة حالياً.</div>';
   modal('🔔 الإشعارات والواجبات', html);
+}
+
+
+/* ===== تحسينات المنصة الجديدة: البطاقات التعليمية (Flashcards) وأصوات التركيز وملخص اليوم ===== */
+let currentFlashcardIndex = 0;
+let flashcardList = [];
+
+function openFlashcards() {
+  flashcardList = [];
+  // Gather all mistakes from submissions
+  const subs = Array.isArray(db.localSubmissions) ? db.localSubmissions : [];
+  subs.forEach(sub => {
+    (sub.answers || []).forEach(ans => {
+      if (ans.type === 'mcq' && ans.isCorrect === false) {
+        flashcardList.push({
+          question: ans.question,
+          wrong: ans.studentAnswer,
+          correct: ans.correctAnswer,
+          exam: sub.examTitle || 'امتحان'
+        });
+      }
+    });
+  });
+  if (!flashcardList.length) {
+    return toast('لا توجد أخطاء في بنك الأخطاء لعمل بطاقات مراجعة منها بعد.');
+  }
+  currentFlashcardIndex = 0;
+  showFlashcardModal();
+}
+
+function showFlashcardModal() {
+  const item = flashcardList[currentFlashcardIndex];
+  const htmlContent = `
+    <div class="item" style="text-align:center;padding:22px;">
+      <span class="tag">${esc(item.exam)} (${currentFlashcardIndex + 1}/${flashcardList.length})</span>
+      <h3 style="margin:14px 0;font-size:16px;">${esc(item.question)}</h3>
+      <div id="flashcardAnswerArea" style="margin:15px 0;">
+        <button class="btn ghost full" onclick="revealFlashcardAnswer()">اظهار الإجابة الصحيحة</button>
+      </div>
+      <div class="row" style="margin-top:20px;justify-content:center;gap:10px;">
+        <button class="btn ghost small" onclick="prevFlashcard()" ${currentFlashcardIndex === 0 ? 'disabled' : ''}>← السابقة</button>
+        <button class="btn ghost small" onclick="nextFlashcard()" ${currentFlashcardIndex === flashcardList.length - 1 ? 'disabled' : ''}>التالية →</button>
+      </div>
+    </div>`;
+  modal('🃏 بطاقات المراجعة السريعة (Flashcards)', htmlContent);
+}
+
+function revealFlashcardAnswer() {
+  const item = flashcardList[currentFlashcardIndex];
+  const area = document.getElementById('flashcardAnswerArea');
+  if (area) {
+    area.innerHTML = `
+      <p class="red"><b>إجابتك السابقة:</b> ${esc(item.wrong)}</p>
+      <p class="green" style="font-size:13px;margin-top:6px;"><b>✅ الإجابة الصحيحة:</b> ${esc(item.correct)}</p>`;
+  }
+}
+
+function nextFlashcard() {
+  if (currentFlashcardIndex < flashcardList.length - 1) {
+    currentFlashcardIndex++;
+    showFlashcardModal();
+  }
+}
+
+function prevFlashcard() {
+  if (currentFlashcardIndex > 0) {
+    currentFlashcardIndex--;
+    showFlashcardModal();
+  }
+}
+
+// Ambient Sounds Web Audio API Synthesizer (No external audio files needed)
+let ambientAudioCtx = null;
+let ambientSourceNode = null;
+let ambientGainNode = null;
+
+function playAmbientSound(type) {
+  stopAmbientSound();
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return toast('متصفحك لا يدعم توليد الأصوات');
+    ambientAudioCtx = new AudioContext();
+    
+    // Create pink/white noise buffer for rain/waves/cafe
+    const bufferSize = ambientAudioCtx.sampleRate * 2;
+    const noiseBuffer = ambientAudioCtx.createBuffer(1, bufferSize, ambientAudioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      if (type === 'rain') {
+        // Pink noise approximation for rain
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        output[i] *= 0.03;
+        b6 = white * 0.115926;
+      } else {
+        // White noise for cafe/waves
+        output[i] = white * 0.04;
+      }
+    }
+
+    ambientSourceNode = ambientAudioCtx.createBufferSource();
+    ambientSourceNode.buffer = noiseBuffer;
+    ambientSourceNode.loop = true;
+
+    ambientGainNode = ambientAudioCtx.createGain();
+    ambientGainNode.gain.value = 0.3;
+
+    // Filter for sound texture
+    const filter = ambientAudioCtx.createBiquadFilter();
+    filter.type = type === 'rain' ? 'lowpass' : type === 'waves' ? 'bandpass' : 'lowpass';
+    filter.frequency.value = type === 'rain' ? 800 : type === 'waves' ? 400 : 1200;
+
+    ambientSourceNode.connect(filter);
+    filter.connect(ambientGainNode);
+    ambientGainNode.connect(ambientAudioCtx.destination);
+    
+    ambientSourceNode.start();
+    toast('تم تشغيل صوت ' + (type === 'rain' ? 'المطر' : type === 'cafe' ? 'المقهى' : 'الأمواج'));
+  } catch (e) {
+    console.warn('Ambient sound error', e);
+    toast('تعذر تشغيل الصوت');
+  }
+}
+
+function stopAmbientSound() {
+  if (ambientSourceNode) {
+    try { ambientSourceNode.stop(); } catch(_) {}
+    ambientSourceNode = null;
+  }
+  if (ambientAudioCtx) {
+    try { ambientAudioCtx.close(); } catch(_) {}
+    ambientAudioCtx = null;
+  }
+}
+
+function renderDailyBriefing() {
+  const host = document.getElementById('dailyBriefingBody');
+  const tag = document.getElementById('briefingTag');
+  if (!host) return;
+  const pending = (db.tasks || []).filter(t => !t.done).slice(0, 3);
+  const streak = typeof streakCount === 'function' ? streakCount() : 0;
+  if (tag) tag.textContent = 'سلسلة أيام: ' + streak + ' 🔥';
+  
+  if (pending.length) {
+    host.innerHTML = `
+      <p><b>صباح النشاط! ☀️ إليك أهم مهام اليوم لتنجزها بتركيز:</b></p>
+      ${pending.map(t => `<div class="item" style="margin:5px 0;padding:6px 10px;">• <b>${esc(t.name)}</b> (${esc(t.subject)}) — ${t.duration} دقيقة</div>`).join('')}
+      <button class="btn greenbtn small full" style="margin-top:8px;" onclick="go('planner')">عرض كل المهام والجدول</button>`;
+  } else {
+    host.innerHTML = `<p><b>صباح التميز! 🎉</b> ليس لديك مهام معلقة اليوم. يمكنك البدء بجلسة تركيز أو حل امتحان جديد لتطوير مستواك.</p>`;
+  }
 }
 
 initializeFirebase();
