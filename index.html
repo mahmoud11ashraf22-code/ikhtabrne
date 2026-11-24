@@ -175,7 +175,7 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
  </div>
 </div>
 <div class="app">
-<header><div class="top"><div class="brand"><span class="mark">🔥</span><div><b>MAHMOUD <span>STUDY</span></b><small>نظّم وقتك • ذاكر بذكاء • حقق هدفك</small></div></div><div style="display:flex;align-items:center;gap:6px"><button class="modebtn" id="dayNightToggle" onclick="toggleDayNight()">☀️ نهاري</button><button class="modebtn" id="modeToggle" onclick="toggleMode()">الوضع البسيط</button><div class="status" id="cloudStatus">● جارٍ الاتصال بالسحابة</div></div></div></header>
+<header><div class="top"><div class="brand"><span class="mark">🔥</span><div><b>MAHMOUD <span>STUDY</span></b><small>نظّم وقتك • ذاكر بذكاء • حقق هدفك</small></div></div><div style="display:flex;align-items:center;gap:6px"><button class="modebtn" id="notifBtn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button><button class="modebtn" id="dayNightToggle" onclick="toggleDayNight()">☀️ نهاري</button><button class="modebtn" id="modeToggle" onclick="toggleMode()">الوضع البسيط</button><div class="status" id="cloudStatus">● جارٍ الاتصال بالسحابة</div></div></div></header>
 <main>
 <section class="page active" id="home">
  <div class="hero"><div class="eyebrow">✦ لوحة التحكم الشخصية</div><h1 id="welcome">أهلاً بيك 👋</h1><p>منصة تعليمية تجمع الامتحانات والفيديوهات والمنتدى وتنظيم المذاكرة في مكان واحد.</p></div>
@@ -237,6 +237,11 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
 <section class="page" id="review">
  <h1>🔁 مراجعتي</h1><p class="sub">خطط مراجعاتك، وسجّل اللي راجعته عشان ما تنساش ترجعله.</p>
  <div class="card"><div class="row"><h2>مراجعات المواد</h2><button class="btn small" onclick="openReview()">+ مراجعة</button></div><div id="reviewsList"></div></div>
+ <div class="card">
+  <h2>❌ بنك الأخطاء للمراجعة اللاحقة</h2>
+  <p class="smallnote">تُجمع هنا الأسئلة التي أخطأت فيها تلقائياً لمراجعتها.</p>
+  <div id="mistakesBankList" class="empty">لا توجد أخطاء مسجلة حتى الآن.</div>
+ </div>
  <div class="card"><div class="row"><h2>🎯 تحدي الأسبوع</h2><span class="tag">هدف شخصي</span></div>
   <p class="smallnote">اختار هدفاً واقعياً، وتابع تقدمك من بياناتك المسجلة.</p>
   <label>هدفي هذا الأسبوع</label><select id="challengeGoal" onchange="saveChallenge()"><option value="2">إنجاز مهمتين</option><option value="3">إنجاز 3 مهام</option><option value="5">إنجاز 5 مهام</option><option value="7">إنجاز 7 مهام</option></select>
@@ -274,6 +279,18 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
  <button class="btn full" onclick="createPlatformExam()">إنشاء الامتحان وتوليد رابطه</button><div id="createdExamLink"></div></div>
  <div class="card"><h2>الامتحانات المنشورة</h2><div id="platformExamList" class="empty">لا توجد امتحانات منشورة بعد.</div></div>
  <div class="card"><h2>📢 إعلانات المنصة</h2><div id="publicAnnouncementList" class="empty">لا توجد إعلانات حالياً.</div></div>
+ <div class="card">
+  <h2>📊 تحليل الأداء ونقاط القوة والضعف</h2>
+  <div id="studentAnalytics" class="empty">حل امتحاناً واحداً على الأقل لعرض التحليل.</div>
+ </div>
+ <div class="card">
+  <h2>🔖 امتحاناتي المحفوظة</h2>
+  <div id="savedExamsList" class="empty">لم تقم بحفظ أي امتحان في المفضلة بعد.</div>
+ </div>
+ <div class="card">
+  <h2>📜 سجل محاولاتي ونتائجي</h2>
+  <div id="myExamHistory" class="empty">لا توجد محاولات سابقة مسجلة.</div>
+ </div>
  <div id="examTaking" class="card" style="display:none"></div>
  
 </section>
@@ -302,7 +319,7 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
  <div class="card"><div class="row"><h2>👀 الزوار والنشاط</h2><button class="btn ghost small" onclick="loadVisitors()">تحديث الزوار</button></div><p class="smallnote">تظهر هنا الزيارات المجهولة حسب المتصفح والجهاز. لا توجد حسابات طلاب أو بيانات تسجيل شخصية.</p><div class="row"><span class="muted" id="visitorsStatus">لم يتم التحميل</span><span class="tag" id="visitorsCount">0 زيارة</span></div><div id="visitorsList" class="empty">افتح لوحة الإدارة واضغط تحديث الزوار.</div></div>
  <div class="card"><h2>⚡ اختصارات الإدارة</h2><div class="grid"><button class="btn ghost" onclick="go('exams')">إدارة الامتحانات</button><button class="btn ghost" onclick="go('videos')">مكتبة الفيديوهات</button><button class="btn ghost" onclick="go('forum')">مراجعة المنتدى</button><button class="btn ghost" onclick="adminLogout()">خروج الإدارة</button></div></div>
  <div class="card"><h2>إدارة المنتدى</h2><div class="row"><span id="forumAdminState">المنتدى مفتوح</span><button class="btn ghost small" onclick="toggleForum()">فتح / غلق المنتدى</button></div><p class="smallnote">تغيير حالة المنتدى يُحفظ في Firebase ويظهر للجميع.</p></div>
- <div class="card"><h2>متابعة نتائج الامتحانات</h2><p class="smallnote">تظهر تسليمات الطلاب. صحّح كل سؤال مقالي بإدخال الدرجة المستحقة ثم حفظها.</p><div id="gradingQueue" class="empty">ستظهر هنا نتائج الطلاب بعد تفعيل المزامنة.</div></div>
+ <div class="card"><h2>متابعة نتائج الامتحانات</h2><p class="smallnote">تظهر درجات الاختياري وإجابات المقالي المحفوظة للمراجعة.</p><div id="gradingQueue" class="empty">ستظهر هنا نتائج الطلاب بعد تفعيل المزامنة.</div></div>
 </section>
 <div id="wordsList" style="display:none"></div><div class="footer">MAHMOUD STUDY • منصة تعليمية<br><b style="color:#d8c9ff">Developer: Mahmoud Ashraf</b><br><a href="https://wa.me/201558288143" target="_blank" rel="noopener" dir="ltr">Contact: 01558288143</a></div>
 </main></div>
@@ -326,7 +343,7 @@ body.day-theme{background:radial-gradient(ellipse at 80% 0%,#e5d9ff 0,transparen
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script>
 let STORAGE_KEY='mahmoud_study_v2_guest'; let activeStudentUid=null; let activeStudentName='';
-const blank=()=>({profile:{name:'',examDate:'',wake:'06:00',sleep:'22:00',status:'مراكم أوي',hours:4},subjects:[],tasks:[],lessons:[],backlog:[],backlogTotal:0,backlogDone:0,backlogTarget:null,focus:{sessions:0,minutes:0},focusLog:[],exams:[],words:[],reviews:[],plan:[],leader:{alias:'',opt:false},gamify:{points:0,studyDays:[],earned:[]},challenge:{goal:3,weekStart:''}});
+const blank=()=>({profile:{name:'',examDate:'',wake:'06:00',sleep:'22:00',status:'مراكم أوي',hours:4},subjects:[],tasks:[],lessons:[],backlog:[],backlogTotal:0,backlogDone:0,backlogTarget:null,focus:{sessions:0,minutes:0},focusLog:[],exams:[],words:[],reviews:[],plan:[],leader:{alias:'',opt:false},gamify:{points:0,studyDays:[],earned:[]},challenge:{goal:3,weekStart:''},savedExams:[]});
 let db=loadDB(),timerSeconds=1500,timerInitial=1500,timerRunning=false,timerInterval=null,timerIsBreak=false,focusTargetId='',focusTargetMeta=null,cloud={ready:false,store:null,functions:null,storage:null};
 let studyMode=localStorage.getItem('mahmoud_study_mode')==='pro'?'pro':'simple';
 function applyMode(){document.body.classList.toggle('pro-mode',studyMode==='pro');let b=document.getElementById('modeToggle'),t=document.getElementById('modeTitle'),d=document.getElementById('modeDesc');if(b)b.textContent=studyMode==='pro'?'الوضع الاحترافي':'الوضع البسيط';if(t)t.textContent=studyMode==='pro'?'الوضع الاحترافي':'الوضع البسيط';if(d)d.textContent=studyMode==='pro'?'كل الأدوات والتحليلات ظاهرة.':'الأساسيات قدامك من غير زحمة.';}
@@ -436,6 +453,8 @@ let week=Date.now()-7*86400000;document.getElementById('weekMinutes').textConten
  let proWeek=Date.now()-7*86400000,proMinutes=db.focusLog.filter(x=>new Date(x.date).getTime()>proWeek).reduce((a,x)=>a+(+x.minutes||0),0),proDone=db.tasks.filter(t=>t.done&&t.completed&&new Date(t.completed).getTime()>proWeek).length,proBacklog=Math.max(0,db.backlogTotal-db.backlogDone)+db.subjects.reduce((n,x)=>n+Math.max(0,(+x.backlog||0)-(+x.backlogDone||0)),0),proPct=db.tasks.length?Math.round(db.tasks.filter(t=>t.done).length/db.tasks.length*100):0;
  [['proWeeklyFocus',proMinutes],['proDoneTasks',proDone],['proBacklog',proBacklog],['proCompletion',proPct+'%']].forEach(([id,v])=>{let el=document.getElementById(id);if(el)el.textContent=v});
  renderGamify();buildWeeklyReport(false);document.getElementById('cloudStatus').textContent=cloud.ready?'● متصل بالسحابة':'● جارٍ الاتصال بالسحابة';document.getElementById('firebaseState').textContent=cloud.ready?'متصل':'غير مهيأ';document.getElementById('firebaseState').className=cloud.ready?'tag':'tag redtag';
+ if(typeof getStudentNotifications==='function')getStudentNotifications();
+ if(typeof renderSavedExams==='function')renderSavedExams();
 }
 
 function ensureGamify(){
@@ -543,7 +562,7 @@ function showAuthGate(message=''){document.body.classList.add('auth-locked');con
 let lastSyncedWordsJSON='',wordsSyncReady=false,wordsUnsubscribe=null;
 function syncStudentWords(uid){if(!cloud.ready||!uid)return;if(wordsUnsubscribe){wordsUnsubscribe();wordsUnsubscribe=null}wordsSyncReady=false;const ref=cloud.store.collection('users').doc(uid).collection('learning').doc('words');wordsUnsubscribe=ref.onSnapshot(async snap=>{if(snap.exists){const incoming=Array.isArray(snap.data().words)?snap.data().words:[],json=JSON.stringify(incoming);if(json!==JSON.stringify(db.words||[])){db.words=incoming;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));render()}lastSyncedWordsJSON=json;wordsSyncReady=true}else{wordsSyncReady=true;lastSyncedWordsJSON='[]';if((db.words||[]).length)await pushStudentWordsIfChanged()}},e=>{wordsSyncReady=false;console.warn('words sync',e);toast('تعذرت مزامنة الكلمات؛ راجع قواعد Firebase')})}
 async function pushStudentWordsIfChanged(){if(!activeStudentUid||!cloud.ready||!wordsSyncReady)return;const json=JSON.stringify(db.words||[]);if(json===lastSyncedWordsJSON)return;lastSyncedWordsJSON=json;try{await cloud.store.collection('users').doc(activeStudentUid).collection('learning').doc('words').set({words:db.words||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){lastSyncedWordsJSON='';console.warn('words save',e);toast('تعذر حفظ الكلمات على Firebase')}}
-function unlockForStudent(user){activeStudentUid=user.uid;activeStudentName=user.displayName||'طالب';STORAGE_KEY='mahmoud_study_v2_'+user.uid;db=loadDB();if(!db.profile.name&&activeStudentName!=='طالب')db.profile.name=activeStudentName;document.body.classList.remove('auth-locked');const nm=document.getElementById('studentName');if(nm&&db.profile.name)nm.value=db.profile.name;const status=document.getElementById('cloudStatus');if(status)status.textContent='● حسابك متصل';render();startPlatformSync();trackStudentVisit(user);syncStudentWords(user.uid);}
+function unlockForStudent(user){activeStudentUid=user.uid;activeStudentName=user.displayName||'طالب';STORAGE_KEY='mahmoud_study_v2_'+user.uid;db=loadDB();if(!db.profile.name&&activeStudentName!=='طالب')db.profile.name=activeStudentName;document.body.classList.remove('auth-locked');const nm=document.getElementById('studentName');if(nm&&db.profile.name)nm.value=db.profile.name;const status=document.getElementById('cloudStatus');if(status)status.textContent='● حسابك متصل';render();startPlatformSync();trackStudentVisit(user);syncStudentWords(user.uid);syncStudentHistory(user.uid);}
 function handleStudentSignedOut(){if(adminUnlocked)return;activeStudentUid=null;activeStudentName='';STORAGE_KEY='mahmoud_study_v2_guest';db=blank();showAuthGate();platformUnsubs.forEach(fn=>{try{fn()}catch(_){}});platformUnsubs=[];if(wordsUnsubscribe){wordsUnsubscribe();wordsUnsubscribe=null}wordsSyncReady=false;platform=platformStore();renderPlatform()}
 function initializeFirebase(){const status=document.getElementById('cloudStatus');if(typeof firebase==='undefined'){if(status)status.textContent='● Firebase غير متاح';showAuthGate('تعذر تحميل Firebase.');return}try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);cloud.store=firebase.firestore();cloud.functions=firebase.functions();cloud.storage=firebase.storage();studentAuth=firebase.auth();cloud.ready=true;if(status)status.textContent='● جارٍ تجهيز تسجيل الدخول';showAuthGate('اكتب رقم الهاتف وكلمة المرور للمتابعة.');studentAuth.setPersistence(firebase.auth.Auth.Persistence.NONE).then(()=>{let firstAuthState=true;studentAuth.onAuthStateChanged(async user=>{if(firstAuthState){firstAuthState=false;if(user){try{await studentAuth.signOut();}catch(e){console.error('Could not clear previous login session',e);showAuthGate('تعذر إنهاء جلسة الدخول السابقة. حدّث الصفحة وحاول مرة أخرى.');return;}return;}handleStudentSignedOut();return;}if(user){adminUnlocked=false;adminPasswordMemory='';unlockForStudent(user)}else{handleStudentSignedOut()}})}).catch(e=>{console.error('Auth persistence setup failed',e);showAuthGate('تعذر تجهيز تسجيل الدخول: '+(e.message||'خطأ غير معروف'));if(status)status.textContent='● تعذر تجهيز الدخول'})}catch(e){cloud.ready=false;if(status)status.textContent='● خطأ اتصال';showAuthGate('تعذر تهيئة Firebase.');console.error(e)}}
 function startPlatformSync(){if(!cloud.ready||!studentAuth?.currentUser)return;platformUnsubs.forEach(fn=>{try{fn()}catch(_){}});platformUnsubs=[];const watch=(collection,key)=>{const un=cloud.store.collection(collection).limit(300).onSnapshot(snap=>{platform[key]=snap.docs.map(d=>({id:d.id,...d.data()}));platform[key].sort((a,b)=>timeValue(b.createdAt)-timeValue(a.createdAt));savePlatform();if(collection==='forumPosts'){const fs=document.getElementById('forumState');if(fs)fs.textContent='متصل • '+platform.posts.length+' مناقشة'}},err=>{console.error('Firestore live sync failed:',collection,err);if(collection==='forumPosts'){const fs=document.getElementById('forumState');if(fs)fs.textContent='تعذر الاتصال بالمنتدى';const host=document.getElementById('forumPosts');if(host)host.innerHTML='<div class="empty">تعذر تحميل المناقشات من Firebase ('+safeText(err.code||'خطأ قراءة')+').</div>';}toast('تعذر مزامنة '+collection+' ('+(err.code||'خطأ')+')')});platformUnsubs.push(un)};watch('publicExams','exams');watch('publicVideos','videos');watch('forumPosts','posts');watch('publicAnnouncements','announcements');watch('publicHtmlExams','htmlExams');const settingsUn=cloud.store.collection('publicSettings').doc('platform').onSnapshot(doc=>{if(doc.exists){platform.forumOpen=doc.data().forumOpen!==false;renderPlatform()}},err=>console.warn('settings sync',err));platformUnsubs.push(settingsUn)}
@@ -601,7 +620,6 @@ function savePlatform(){renderPlatform()}
 function safeText(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function youtubeId(url){try{let u=new URL(url);if(u.hostname.includes('youtu.be'))return u.pathname.slice(1);if(u.hostname.includes('youtube.com'))return u.searchParams.get('v')||u.pathname.split('/').pop();}catch(e){}return ''}
 let builderQuestions=[{type:'mcq',text:'',choices:['','','',''],answer:'',points:1}];
-let activeExamReviewId=null;
 
 function importQuestionsFromHtml(){
  const input=document.getElementById('importExamHtmlFile'),file=input?.files?.[0],status=document.getElementById('importExamStatus');
@@ -652,46 +670,185 @@ async function publishForumPost(){const user=studentAuth?.currentUser;if(!user)r
 async function toggleForum(){if(!adminUnlocked)return toast('افتح لوحة الإدارة بكلمة المرور');try{let next=!platform.forumOpen;await adminCall('setForumOpen',{open:next});platform.forumOpen=next;renderPlatform();toast(next?'تم فتح المنتدى للجميع':'تم غلق المنتدى')}catch(e){toast(e.message||'تعذر تغيير حالة المنتدى')}}
 async function publishAnnouncement(){if(!adminUnlocked)return toast('هذه العملية للإدارة فقط');let text=document.getElementById('announcementText').value.trim();if(!text)return toast('اكتب نص الإعلان');try{await adminCall('publishAnnouncement',{text});document.getElementById('announcementText').value='';toast('تم نشر الإعلان للجميع')}catch(e){toast('تعذر نشر الإعلان: '+e.message)}}
 function adminDeleteControl(collection,id){return adminUnlocked?'<button class="btn danger small" onclick="deletePublicItem(\''+collection+'\',\''+safeText(id)+'\')">حذف</button>':''}
-function renderPlatform(){let take=document.getElementById('examTaking'),requested=new URLSearchParams(location.search).get('exam');if(take&&requested&&activeExamReviewId!==requested){let e=platform.exams.find(x=>x.id===requested);if(e){let qs=e.questions||[];take.style.display='block';take.innerHTML='<h2>'+safeText(e.title)+'</h2><p class="smallnote">'+safeText(e.subject)+' • '+e.duration+' دقيقة</p><p>'+safeText(e.desc)+'</p>'+(qs.length?qs.map((q,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(q.text)+'</b>'+(q.type==='essay'?'<label>إجابتك المقالية</label><textarea id="essay_'+i+'" rows="5" placeholder="اكتب إجابتك هنا"></textarea>':'<div>'+q.choices.map((v,j)=>'<label class="checkline"><input type="radio" name="exam_'+i+'" value="'+j+'"> '+['أ','ب','ج','د'][j]+' — '+safeText(v)+'</label>').join('')+'</div>')+'</div>').join(''):'<div class="empty">هذا الامتحان لا يحتوي على أسئلة.</div>')+(qs.length?'<button class="btn full" onclick="submitPlatformExam(\''+e.id+'\')">تسليم الامتحان</button><p class="smallnote">يتم تصحيح الاختياري تلقائياً، وتُحفظ الإجابات المقالية للمراجعة اليدوية.</p>':'')}else{take.style.display='block';take.innerHTML='<div class="empty">الامتحان غير موجود أو لم يكتمل تحميل بيانات Firebase بعد.</div>'}}else if(take&&!requested){take.style.display='none';}let ex=document.getElementById('platformExamList');if(ex)ex.innerHTML=platform.exams.length?platform.exams.map(e=>'<div class="item"><b>'+safeText(e.title)+'</b><p>'+((e.questions||[]).length)+' سؤال • '+e.duration+' دقيقة</p><button class="btn ghost small" onclick="copyPlatformLink(\''+e.id+'\')">نسخ الرابط</button>'+adminDeleteControl('publicExams',e.id)+'</div>').join(''):'<div class="empty">لا توجد امتحانات بعد.</div>';let vl=document.getElementById('videoLibrary');if(vl)vl.innerHTML=platform.videos.length?platform.videos.map(v=>'<div class="item"><b>'+safeText(v.title)+'</b><p>'+safeText(v.subject)+' • '+safeText(v.unit)+'</p><a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.youtubeId)+'" target="_blank" rel="noopener">مشاهدة على YouTube ↗</a>'+adminDeleteControl('publicVideos',v.id)+'</div>').join(''):'<div class="empty">لم تتم إضافة فيديوهات بعد.</div>';let fp=document.getElementById('forumPosts');if(fp){fp.innerHTML=platform.posts.length?[...platform.posts].reverse().map(p=>{let mine=!!activeStudentUid&&p.authorUid===activeStudentUid;let stamp=p.createdAt?.toDate?p.createdAt.toDate().toLocaleString('ar-EG'):(p.createdAt?safeText(p.createdAt):'الآن');let legacy=p.title&&p.title!=='رسالة'?'<div class="chat-message-title">'+safeText(p.title)+'</div>':'';return '<div class="chat-message '+(mine?'mine':'')+'"><div class="chat-message-head"><b>'+safeText(p.authorName||'طالب')+'</b><time>'+stamp+'</time></div>'+legacy+'<div class="chat-message-body">'+safeText(p.body)+'</div><div class="chat-message-tools">'+adminDeleteControl('forumPosts',p.id)+'</div></div>'}).join(''):'<div class="empty">لا توجد رسائل بعد. ابدأ المحادثة.</div>';fp.scrollTop=fp.scrollHeight;}let forumInput=document.getElementById('forumBody'),forumSend=document.getElementById('forumSendBtn');if(forumInput)forumInput.disabled=!platform.forumOpen;if(forumSend)forumSend.disabled=!platform.forumOpen;let forumHint=document.getElementById('forumHint');if(forumHint)forumHint.textContent=platform.forumOpen?'احترم الآخرين. الرسائل تُحفظ على Firebase وتظهر للحسابات الأخرى.':'المنتدى مغلق حالياً بواسطة الإدارة.';let al=document.getElementById('announcementList');if(al)al.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+adminDeleteControl('publicAnnouncements',a.id)+'</div>').join('');let pal=document.getElementById('publicAnnouncementList');if(pal)pal.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+'</div>').join('')||'<div class="empty">لا توجد إعلانات حالياً.</div>';[['adminExamCount',platform.exams.length],['adminVideoCount',platform.videos.length],['adminPostCount',platform.posts.length],['adminNoticeCount',platform.announcements.length]].forEach(([id,n])=>{let x=document.getElementById(id);if(x)x.textContent=n});let fs=document.getElementById('forumState');if(fs)fs.textContent=platform.forumOpen?'مفتوح':'مغلق';let fas=document.getElementById('forumAdminState');if(fas)fas.textContent=platform.forumOpen?'المنتدى مفتوح':'المنتدى مغلق'}
+function renderPlatform(){let take=document.getElementById('examTaking'),requested=new URLSearchParams(location.search).get('exam');if(take&&requested){let e=platform.exams.find(x=>x.id===requested);if(e){let qs=e.questions||[];take.style.display='block';take.innerHTML='<h2>'+safeText(e.title)+'</h2><p class="smallnote">'+safeText(e.subject)+' • '+e.duration+' دقيقة</p><p>'+safeText(e.desc)+'</p>'+(qs.length?qs.map((q,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(q.text)+'</b>'+(q.type==='essay'?'<label>إجابتك المقالية</label><textarea id="essay_'+i+'" rows="5" placeholder="اكتب إجابتك هنا"></textarea>':'<div>'+q.choices.map((v,j)=>'<label class="checkline"><input type="radio" name="exam_'+i+'" value="'+j+'"> '+['أ','ب','ج','د'][j]+' — '+safeText(v)+'</label>').join('')+'</div>')+'</div>').join(''):'<div class="empty">هذا الامتحان لا يحتوي على أسئلة.</div>')+(qs.length?'<button class="btn full" onclick="submitPlatformExam(\''+e.id+'\')">تسليم الامتحان</button><p class="smallnote">يتم تصحيح الاختياري تلقائياً، وتُحفظ الإجابات المقالية للمراجعة اليدوية.</p>':'')}else{take.style.display='block';take.innerHTML='<div class="empty">الامتحان غير موجود أو لم يكتمل تحميل بيانات Firebase بعد.</div>'}}else if(take)take.style.display='none';let ex=document.getElementById('platformExamList');if(ex)ex.innerHTML=platform.exams.length?platform.exams.map(e=>'<div class="item"><b>'+safeText(e.title)+'</b><p>'+((e.questions||[]).length)+' سؤال • '+e.duration+' دقيقة</p><button class="btn ghost small" onclick="copyPlatformLink(\''+e.id+'\')">نسخ الرابط</button> <button class="btn ghost small" onclick="toggleSaveExam(\''+safeText(e.id)+'\')">🔖 ${(db.savedExams||[]).includes(e.id)?'محفوظ':'حفظ'}</button>'+adminDeleteControl('publicExams',e.id)+'</div>').join(''):'<div class="empty">لا توجد امتحانات بعد.</div>';let vl=document.getElementById('videoLibrary');if(vl)vl.innerHTML=platform.videos.length?platform.videos.map(v=>'<div class="item"><b>'+safeText(v.title)+'</b><p>'+safeText(v.subject)+' • '+safeText(v.unit)+'</p><a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.youtubeId)+'" target="_blank" rel="noopener">مشاهدة على YouTube ↗</a>'+adminDeleteControl('publicVideos',v.id)+'</div>').join(''):'<div class="empty">لم تتم إضافة فيديوهات بعد.</div>';let fp=document.getElementById('forumPosts');if(fp){fp.innerHTML=platform.posts.length?[...platform.posts].reverse().map(p=>{let mine=!!activeStudentUid&&p.authorUid===activeStudentUid;let stamp=p.createdAt?.toDate?p.createdAt.toDate().toLocaleString('ar-EG'):(p.createdAt?safeText(p.createdAt):'الآن');let legacy=p.title&&p.title!=='رسالة'?'<div class="chat-message-title">'+safeText(p.title)+'</div>':'';return '<div class="chat-message '+(mine?'mine':'')+'"><div class="chat-message-head"><b>'+safeText(p.authorName||'طالب')+'</b><time>'+stamp+'</time></div>'+legacy+'<div class="chat-message-body">'+safeText(p.body)+'</div><div class="chat-message-tools">'+adminDeleteControl('forumPosts',p.id)+'</div></div>'}).join(''):'<div class="empty">لا توجد رسائل بعد. ابدأ المحادثة.</div>';fp.scrollTop=fp.scrollHeight;}let forumInput=document.getElementById('forumBody'),forumSend=document.getElementById('forumSendBtn');if(forumInput)forumInput.disabled=!platform.forumOpen;if(forumSend)forumSend.disabled=!platform.forumOpen;let forumHint=document.getElementById('forumHint');if(forumHint)forumHint.textContent=platform.forumOpen?'احترم الآخرين. الرسائل تُحفظ على Firebase وتظهر للحسابات الأخرى.':'المنتدى مغلق حالياً بواسطة الإدارة.';let al=document.getElementById('announcementList');if(al)al.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+adminDeleteControl('publicAnnouncements',a.id)+'</div>').join('');let pal=document.getElementById('publicAnnouncementList');if(pal)pal.innerHTML=platform.announcements.map(a=>'<div class="item">'+safeText(a.text)+'</div>').join('')||'<div class="empty">لا توجد إعلانات حالياً.</div>';[['adminExamCount',platform.exams.length],['adminVideoCount',platform.videos.length],['adminPostCount',platform.posts.length],['adminNoticeCount',platform.announcements.length]].forEach(([id,n])=>{let x=document.getElementById(id);if(x)x.textContent=n});let fs=document.getElementById('forumState');if(fs)fs.textContent=platform.forumOpen?'مفتوح':'مغلق';let fas=document.getElementById('forumAdminState');if(fas)fas.textContent=platform.forumOpen?'المنتدى مفتوح':'المنتدى مغلق';if(typeof getStudentNotifications==='function')getStudentNotifications();if(typeof renderSavedExams==='function')renderSavedExams();}
 
-async function submitPlatformExam(id){
- if(!studentAuth?.currentUser)return toast('سجّل الدخول أولاً لتسليم الامتحان');
- const e=platform.exams.find(x=>x.id===id);if(!e)return toast('الامتحان غير متاح');
- const qs=e.questions||[];if(!qs.length)return toast('لا توجد أسئلة في هذا الامتحان');
- let correct=0,total=0,answered=0,essayCount=0;
- const answers=qs.map((q,i)=>{
-  if(q.type==='essay'){
-   const value=(document.getElementById('essay_'+i)?.value||'').trim();essayCount++;if(value)answered++;
-   return {questionIndex:i,question:q.text,type:'essay',studentAnswer:value,correctAnswer:q.correctAnswer||'',points:Math.max(1,+q.points||1),status:'بانتظار المراجعة اليدوية'};
-  }
-  const pts=Math.max(1,+q.points||1);total+=pts;
-  const selected=document.querySelector('input[name="exam_'+i+'"]:checked');
-  const val=selected?String(selected.value):'';if(selected)answered++;
-  const isCorrect=!!selected&&val===String(q.answer);
-  if(isCorrect)correct+=pts;
-  return {questionIndex:i,question:q.text,type:'mcq',studentAnswer:val===''?'لم تتم الإجابة':(q.choices?.[+val]||''),studentChoice:val,correctAnswer:q.choices?.[+q.answer]||'لم يحدد واضع الامتحان إجابة صحيحة',isCorrect,points:pts,earned:isCorrect?pts:0};
- });
- const percent=total?Math.round(correct/total*100):0;
- const submission={examId:id,examTitle:e.title,correct,total,percent,answered,essayCount,status:essayCount?'تم تصحيح الاختياري • المقالي بانتظار المراجعة':'تم التصحيح تلقائياً',answers,studentUid:studentAuth.currentUser.uid,studentName:db.profile.name||studentAuth.currentUser.displayName||'طالب',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
- const host=document.getElementById('examTaking');
- try{
-  await cloud.store.collection('examSubmissions').add(submission);
-  activeExamReviewId=id;
-  const review=answers.map((a,i)=>{
-   const question='<div class="item exam-review-item"><h3>السؤال '+(i+1)+': '+safeText(a.question)+'</h3>';
-   if(a.type==='essay')return question+'<p><b>إجابتك المقالية:</b></p><div class="smart-answer">'+safeText(a.studentAnswer||'لم تتم الإجابة')+'</div><p><b>الإجابة النموذجية:</b></p><div class="smart-answer">'+safeText(a.correctAnswer||'لم يحدد واضع الامتحان إجابة نموذجية')+'</div><span class="tag redtag">بانتظار تصحيح الإدارة • '+a.points+' درجات</span></div>';
-   return question+'<p><b>إجابتك:</b> '+safeText(a.studentAnswer)+'</p><p><b>الإجابة الصحيحة:</b> <span class="green">'+safeText(a.correctAnswer)+'</span></p><span class="tag '+(a.isCorrect?'':'redtag')+'">'+(a.isCorrect?'✓ إجابة صحيحة':'✗ إجابة غير صحيحة')+' • درجتك '+a.earned+' من '+a.points+'</span></div>';
-  }).join('');
-  host.innerHTML='<div class="card"><h2>تم تسليم الامتحان ✓</h2><div class="stat"><b>'+correct+' / '+total+'</b><span>درجة الاختياري • '+percent+'%</span></div><p>عدد الإجابات: '+answered+' من '+qs.length+'</p>'+(essayCount?'<p class="smallnote">تم حفظ '+essayCount+' سؤال مقالي. ستظهر درجته بعد مراجعة الإدارة.</p>':'')+'</div><h2>📋 مراجعة إجابات الامتحان سؤالًا بسؤال</h2><p class="smallnote">راجع إجابتك بجانب الإجابة الصحيحة لكل سؤال.</p>'+review;
-  host.scrollIntoView({behavior:'smooth',block:'start'});
-  toast('تم حفظ التسليم وظهرت مراجعة كل سؤال');
- }catch(err){console.error('exam submission failed',err);toast('تعذر حفظ التسليم: '+(err.message||'خطأ غير معروف'));}
-}
+async function submitPlatformExam(id){if(!studentAuth?.currentUser)return toast('سجّل الدخول أولاً لتسليم الامتحان');const e=platform.exams.find(x=>x.id===id);if(!e)return;const qs=e.questions||[];if(!qs.length)return toast('لا توجد أسئلة في هذا الامتحان');let correct=0,total=0,answered=0,essayCount=0;const answers=qs.map((q,i)=>{if(q.type==='essay'){const value=(document.getElementById('essay_'+i)?.value||'').trim();essayCount++;if(value)answered++;return {questionIndex:i,question:q.text,type:'essay',studentAnswer:value,correctAnswer:q.correctAnswer||'',points:Math.max(1,+q.points||1),status:'بانتظار المراجعة اليدوية'}}const pts=Math.max(1,+q.points||1);total+=pts;const c=document.querySelector('input[name="exam_'+i+'"]:checked');const val=c?String(c.value):'';if(c)answered++;const isCorrect=!!c&&val===String(q.answer);if(isCorrect)correct+=pts;return {questionIndex:i,question:q.text,type:'mcq',studentAnswer:val===''?'لم تتم الإجابة':(q.choices[+val]||''),studentChoice:val,correctAnswer:q.choices[+q.answer]||'',isCorrect,points:pts,earned:isCorrect?pts:0}});const percent=total?Math.round(correct/total*100):0;const submission={examId:id,examTitle:e.title,subject:e.subject||'عام',correct,total,percent,answered,essayCount,status:essayCount?'تم تصحيح الاختياري • المقالي بانتظار المراجعة':'تم التصحيح تلقائياً',answers,studentUid:studentAuth.currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()};try{await cloud.store.collection('examSubmissions').add({...submission,studentName:db.profile.name||studentAuth.currentUser.displayName||'طالب'});const review=answers.map((a,i)=>'<div class="item"><b>'+(i+1)+'. '+safeText(a.question)+'</b>'+(a.type==='essay'?'<p><b>إجابتك:</b><br>'+safeText(a.studentAnswer||'لم تتم الإجابة')+'</p><p><b>الإجابة النموذجية:</b><br>'+safeText(a.correctAnswer||'لم يحدد واضع الامتحان إجابة نموذجية')+'</p><span class="tag">بانتظار المراجعة اليدوية • '+a.points+' درجات</span>':'<p>إجابتك: '+safeText(a.studentAnswer)+'</p><p>الإجابة الصحيحة: '+safeText(a.correctAnswer)+'</p><span class="tag '+(a.isCorrect?'':'redtag')+'">'+(a.isCorrect?'إجابة صحيحة':'إجابة غير صحيحة')+' • '+a.earned+'/'+a.points+'</span>')+'</div>').join('');document.getElementById('examTaking').innerHTML='<h2>تم تسليم الامتحان ✓</h2><div class="stat"><b>'+correct+' / '+total+'</b><span>درجة الاختياري • '+percent+'%</span></div><p>عدد الإجابات: '+answered+' من '+qs.length+'</p>'+(essayCount?'<p class="smallnote">لديك '+essayCount+' سؤال مقالي محفوظ للمراجعة اليدوية، ودرجته غير محسوبة بعد.</p>':'')+'<h3>مراجعة إجاباتك</h3>'+review;toast('تم تسليم الامتحان وحفظ إجاباتك')}catch(err){toast('تعذر حفظ التسليم: '+err.message)}}
 
 function adminLogout(){adminUnlocked=false;adminPasswordMemory='';if(!studentAuth?.currentUser){showAuthGate();toast('تم إغلاق لوحة الإدارة')}else{go('home');toast('تم إغلاق لوحة الإدارة')}}
 const oldGo=go;go=function(id){if(id==='admin'){if(!adminUnlocked){adminLogin();return}}oldGo(id);renderPlatform();if(id==='admin'){loadVisitors();loadAdminSubmissions()}};
 function toggleDayNight(){let day=!document.body.classList.contains('day-theme');document.body.classList.toggle('day-theme',day);localStorage.setItem('mahmoud_day_theme',day?'day':'night');let b=document.getElementById('dayNightToggle');if(b)b.textContent=day?'🌙 ليلي':'☀️ نهاري'}
 function applyDayNight(){let day=localStorage.getItem('mahmoud_day_theme')==='day';document.body.classList.toggle('day-theme',day);let b=document.getElementById('dayNightToggle');if(b)b.textContent=day?'🌙 ليلي':'☀️ نهاري'}
+
+
+/* ===== المميزات المضافة: التحليل، السجل، بنك الأخطاء، المحفوظات، الإشعارات ===== */
+let historyUnsubscribe = null;
+function syncStudentHistory(uid) {
+  if (!cloud.ready || !uid) return;
+  if (historyUnsubscribe) { try { historyUnsubscribe(); } catch (_) {} }
+  historyUnsubscribe = cloud.store.collection('examSubmissions')
+    .where('studentUid', '==', uid)
+    .onSnapshot(snap => {
+      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => timeValue(b.createdAt) - timeValue(a.createdAt));
+      const host = document.getElementById('myExamHistory');
+      if (host) {
+        host.innerHTML = rows.length ? rows.map(r => `
+          <div class="item">
+            <div class="row">
+              <strong>${esc(r.examTitle || 'امتحان')}</strong>
+              <span class="tag ${(r.percent ?? 0) >= 50 ? '' : 'redtag'}">${r.percent ?? 0}%</span>
+            </div>
+            <p>${r.subject ? esc(r.subject) + ' • ' : ''}الدرجة: ${r.correct ?? 0} من ${r.total ?? 0} • الحالة: ${esc(r.status || 'مكتمل')}</p>
+          </div>`).join('') : '<div class="empty">لا توجد محاولات سابقة مسجلة.</div>';
+      }
+      renderStudentAnalytics(rows);
+      renderMistakesBank(rows);
+    }, err => console.warn('history sync', err));
+}
+
+function renderStudentAnalytics(submissions) {
+  const host = document.getElementById('studentAnalytics');
+  if (!host) return;
+  if (!submissions.length) {
+    host.innerHTML = '<div class="empty">حل امتحاناً واحداً على الأقل لعرض التحليل.</div>';
+    return;
+  }
+  const stats = {};
+  submissions.forEach(s => {
+    const matchedExam = (platform.exams || []).find(e => e.id === s.examId);
+    const subj = s.subject || matchedExam?.subject || 'عام';
+    if (!stats[subj]) stats[subj] = { correct: 0, total: 0 };
+    stats[subj].correct += Number(s.correct || 0);
+    stats[subj].total += Number(s.total || 0);
+  });
+  const list = Object.entries(stats).map(([subject, data]) => ({
+    subject,
+    pct: data.total ? Math.round((data.correct / data.total) * 100) : 0
+  })).sort((a, b) => b.pct - a.pct);
+
+  const strengths = list.filter(x => x.pct >= 75);
+  const weak = list.filter(x => x.pct < 75);
+
+  host.innerHTML = `
+    <div class="item">
+      <strong class="green">💪 نقاط القوة (75% فأكثر):</strong>
+      <p>${strengths.length ? strengths.map(x => `${esc(x.subject)} (${x.pct}%)`).join(' • ') : 'لا توجد مواد متفوقة مسجلة بعد.'}</p>
+    </div>
+    <div class="item">
+      <strong class="red">⚠️ موضوعات تحتاج مراجعة (أقل من 75%):</strong>
+      <p>${weak.length ? weak.map(x => `${esc(x.subject)} (${x.pct}%)`).join(' • ') : 'أداؤك ممتاز في جميع المواد المسجلة!'}</p>
+    </div>`;
+}
+
+function renderMistakesBank(submissions) {
+  const host = document.getElementById('mistakesBankList');
+  if (!host) return;
+  const mistakes = [];
+  submissions.forEach(sub => {
+    (sub.answers || []).forEach(ans => {
+      if (ans.type === 'mcq' && ans.isCorrect === false) {
+        mistakes.push({
+          exam: sub.examTitle || 'امتحان',
+          question: ans.question,
+          wrong: ans.studentAnswer,
+          correct: ans.correctAnswer
+        });
+      }
+    });
+  });
+
+  host.innerHTML = mistakes.length ? mistakes.map(m => `
+    <div class="item">
+      <div class="row">
+        <strong>${esc(m.exam)}</strong>
+        <button class="btn ghost small" onclick="addMistakeToReview('${encodeURIComponent(m.question)}')">+ أضف للمراجعة</button>
+      </div>
+      <p><b>السؤال:</b> ${esc(m.question)}</p>
+      <p class="red">إجابتك: ${esc(m.wrong)}</p>
+      <p class="green">الصحيح: ${esc(m.correct)}</p>
+    </div>`).join('') : '<div class="empty">لا توجد أخطاء مسجلة! استمر على هذا المستوى.</div>';
+}
+
+function addMistakeToReview(encodedQ) {
+  const q = decodeURIComponent(encodedQ);
+  db.reviews.push({
+    id: Date.now(),
+    name: 'مراجعة خطأ: ' + q.slice(0, 45) + (q.length > 45 ? '...' : ''),
+    date: new Date().toISOString().slice(0, 10),
+    duration: 15,
+    done: false
+  });
+  saveDB();
+  toast('تمت إضافة السؤال إلى قائمة مراجعاتك');
+}
+
+function toggleSaveExam(examId) {
+  if (!Array.isArray(db.savedExams)) db.savedExams = [];
+  const idx = db.savedExams.indexOf(examId);
+  if (idx >= 0) {
+    db.savedExams.splice(idx, 1);
+    toast('تمت الإزالة من المحفوظات');
+  } else {
+    db.savedExams.push(examId);
+    toast('تم حفظ الامتحان للرجوع إليه لاحقاً');
+  }
+  saveDB();
+  renderPlatform();
+}
+
+function renderSavedExams() {
+  const host = document.getElementById('savedExamsList');
+  if (!host) return;
+  const saved = (platform.exams || []).filter(e => (db.savedExams || []).includes(e.id));
+  host.innerHTML = saved.length ? saved.map(e => `
+    <div class="item">
+      <div class="row">
+        <strong>${esc(e.title)}</strong>
+        <div>
+          <a class="btn greenbtn small" href="?exam=${encodeURIComponent(e.id)}">بدء</a>
+          <button class="btn danger small" onclick="toggleSaveExam('${esc(e.id)}')">إزالة</button>
+        </div>
+      </div>
+      <p>${esc(e.subject || '')} • ${e.duration} دقيقة</p>
+    </div>`).join('') : '<div class="empty">لم تقم بحفظ أي امتحان في المفضلة بعد.</div>';
+}
+
+function getStudentNotifications() {
+  const alerts = [];
+  (db.tasks || []).filter(t => !t.done).forEach(t => {
+    alerts.push({
+      type: 'واجب',
+      title: t.name,
+      desc: `${t.subject} ${t.date ? '• التسليم: ' + t.date : ''}`,
+      action: "closeModal();go('planner')"
+    });
+  });
+  (platform.exams || []).slice(0, 3).forEach(e => {
+    alerts.push({
+      type: 'امتحان جديد',
+      title: e.title,
+      desc: `${e.subject || ''} • ${e.duration} دقيقة`,
+      action: `closeModal();location.href='?exam=${encodeURIComponent(e.id)}'`
+    });
+  });
+  const badge = document.getElementById('notifCount');
+  if (badge) badge.textContent = alerts.length;
+  return alerts;
+}
+
+function openNotifications() {
+  const alerts = getStudentNotifications();
+  const html = alerts.length ? alerts.map(a => `
+    <div class="item">
+      <div class="row">
+        <strong>${esc(a.title)}</strong>
+        <span class="tag ${a.type === 'واجب' ? 'redtag' : ''}">${a.type}</span>
+      </div>
+      <p>${esc(a.desc)}</p>
+      <button class="btn ghost small" onclick="${a.action}">فتح الآن</button>
+    </div>`).join('') : '<div class="empty">لا توجد إشعارات أو واجبات جديدة حالياً.</div>';
+  modal('🔔 الإشعارات والواجبات', html);
+}
 
 initializeFirebase();
 renderQuestionBuilder();applyDayNight();
